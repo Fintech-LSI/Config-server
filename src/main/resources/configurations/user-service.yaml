@@ -1,0 +1,13 @@
+server:
+  port: 8090
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/payment
+    username: postgres
+    password: password
+    jpa:
+      hibernate:
+        ddl-auto: create
+      database: user_service_db
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
