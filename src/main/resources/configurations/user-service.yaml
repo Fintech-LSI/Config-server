@@ -1,13 +1,14 @@
 server:
   port: 8090
+
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/payment
-    username: postgres
-    password: password
-    jpa:
-      hibernate:
-        ddl-auto: create
-      database: user_service_db
-      database-platform: org.hibernate.dialect.PostgreSQLDialect
+    url: jdbc:postgresql://localhost:5432/user_service_db  # Ensure this is your actual database name
+    username: postgres                             # Database username
+    password: password                             # Database password
+  jpa:
+    hibernate:
+      ddl-auto: create                             # Use 'update' for schema updates without dropping
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
