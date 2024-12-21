@@ -1,0 +1,19 @@
+server:
+  port: 8222
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: user-service
+          uri: lb:http://USER-SERVICE
+          predicates:
+            - Path=/api/users/**    # Ensure correct spacing for predicates
+
+        - id: image-service      # New route for image endpoints
+          uri: lb:http://USER-SERVICE  # Assuming image endpoint is served by user-service
+          predicates:
+            - Path=/users/public/images/**  # Route for serving images
+
