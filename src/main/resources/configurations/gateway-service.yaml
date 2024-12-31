@@ -17,3 +17,13 @@ spring:
           predicates:
             - Path=/users/public/images/**  # Route for serving images
 
+        - id: wallet-service
+          uri: lb:http://WALLET-SERVICE
+          predicates:
+            - Path=/api/wallets/**
+
+        - id: auth-service
+          uri: lb:http://AUTH-SERVICE
+          predicates:
+            - Path=/api/auth/**
+
