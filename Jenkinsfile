@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_REGION      = 'us-east-1'
-        IMAGE_NAME      = 'config-server'
+        IMAGE_NAME      = 'config-service'
         ECR_REGISTRY    = 'public.ecr.aws/z1z0w2y6'
         DOCKER_BUILD_NUMBER = "${BUILD_NUMBER}"
         EKS_CLUSTER_NAME = 'main-cluster'
