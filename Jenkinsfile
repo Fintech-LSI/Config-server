@@ -96,7 +96,7 @@ pipeline {
                             // Check pod status
                             sh """
                                 echo "Checking pod status:"
-                                kubectl get pods -n ${NAMESPACE} -l app=config-server
+                                kubectl get pods -n ${NAMESPACE} -l app=config-service
                             """
 
                         } catch (Exception e) {

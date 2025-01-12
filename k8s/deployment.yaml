@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: config-server-deploy
+  name: config-service-deploy
   namespace: fintech
   labels:
-    app: config-server
+    app: config-service
 spec:
   replicas: 2
   strategy:
@@ -14,22 +14,22 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: config-server
+      app: config-service
   template:
     metadata:
       labels:
-        app: config-server
+        app: config-service
     spec:
       containers:
-        - name: config-server
-          image: public.ecr.aws/z1z0w2y6/config-server:latest
+        - name: config-service
+          image: public.ecr.aws/z1z0w2y6/config-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8889
               name: http
           envFrom:
             - configMapRef:
-                name: config-server-config
+                name: config-service-config
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "native"

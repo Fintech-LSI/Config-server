@@ -12,7 +12,7 @@ data:
       profiles:
         active: native
       application:
-        name: config-server
+        name: config-service
       cloud:
         config:
           server:
