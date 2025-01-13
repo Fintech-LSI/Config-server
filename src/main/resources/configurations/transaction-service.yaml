@@ -1,16 +1,18 @@
 server:
-  port: 8090
+  port: 8599
+
 
 spring:
   datasource:
+    username: postgres
+    password: password
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/user_service_db  # Ensure this is your actual database name
-    username: postgres                             # Database username
-    password: password                             # Database password
+    url: jdbc:postgresql://localhost:5432/transaction_service_db  # Ensure this is your actual database name
   jpa:
     hibernate:
       ddl-auto: update                             # Use 'update' for schema updates without dropping
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
 
 eureka:
   client:

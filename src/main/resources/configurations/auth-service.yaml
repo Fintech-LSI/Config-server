@@ -15,3 +15,12 @@ spring:
         format_sql: true
 server:
   port: 8946
+
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/  # Eureka server URL
+  instance:
+    preferIpAddress: true  # Register IP address instead of hostname

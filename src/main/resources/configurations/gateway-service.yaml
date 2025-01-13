@@ -1,5 +1,6 @@
 server:
   port: 8222
+
 spring:
   cloud:
     gateway:
@@ -8,23 +9,37 @@ spring:
           enabled: true
       routes:
         - id: user-service
-          uri: lb:http://USER-SERVICE
+          uri: lb://USER-SERVICE # Load-balanced URI
           predicates:
-            - Path=/api/users/**    # Ensure correct spacing for predicates
+            - Path=/api/users/** # Ensure spacing and correct predicate format
 
-        - id: image-service      # New route for image endpoints
-          uri: lb:http://USER-SERVICE  # Assuming image endpoint is served by user-service
+        - id: image-service
+          uri: lb://USER-SERVICE # Assuming image endpoint is served by user-service
           predicates:
-            - Path=/users/public/images/**  # Route for serving images
+            - Path=/users/public/images/**
 
         - id: wallet-service
-          uri: lb:http://WALLET-SERVICE
+          uri: lb://WALLET-SERVICE
           predicates:
             - Path=/api/wallets/**
 
+        - id: wallet-service-currency
+          uri: lb://WALLET-SERVICE
+          predicates:
+            - Path=/api/currencies/**
+
         - id: auth-service
-          uri: lb:http://AUTH-SERVICE
+          uri: lb://AUTH-SERVICE
           predicates:
             - Path=/api/auth/**
 
-
+        - id: transaction-service
+          uri: lb://TRANSACTION-SERVICE
+          predicates:
+            - Path=/api/transaction/** # Corrected spacing and added missing "/*" for full path match
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/  # Eureka server URL
+  instance:
+    preferIpAddress: true  # Register IP address instead of hostname
