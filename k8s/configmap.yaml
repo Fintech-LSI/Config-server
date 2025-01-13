@@ -1,17 +1,20 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: config-server-config
-  namespace: infrastructure
+  name: config-service-config
+  namespace: fintech
 data:
-  spring.profiles.active: "prod"
-  config.git.uri: "https://github.com/your-org/config-repo.git"
-  application.yml: |
+  application.yml: |-
     server:
-      port: 8222
+      port: 8889
+    
     spring:
+      profiles:
+        active: native
+      application:
+        name: config-service
       cloud:
         config:
           server:
-            git:
-              default-label: main
+            native:
+              search-locations: classpath:/configurations

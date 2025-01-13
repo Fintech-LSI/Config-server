@@ -1,44 +1,65 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: config-server
-  namespace: infrastructure
+  name: config-service-deploy
+  namespace: fintech
+  labels:
+    app: config-service
 spec:
-  replicas: 1
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
-      app: config-server
+      app: config-service
   template:
     metadata:
       labels:
-        app: config-server
+        app: config-service
     spec:
       containers:
-        - name: config-server
-          image: ${process.env.ECR_REPO}/config-server:latest
+        - name: config-service
+          image: public.ecr.aws/z1z0w2y6/config-service:latest
+          imagePullPolicy: Always
           ports:
-            - containerPort: 8222
+            - containerPort: 8889
+              name: http
+          envFrom:
+            - configMapRef:
+                name: config-service-config
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "native"
           resources:
             requests:
-              memory: "512Mi"
-              cpu: "250m"
+              memory: "200Mi"
+              cpu: "100m"
             limits:
-              memory: "1Gi"
-              cpu: "500m"
+              memory: "400Mi"
+              cpu: "200m"
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: 8222
+              port: 8889
             initialDelaySeconds: 30
             periodSeconds: 10
-          env:
-            - name: SPRING_PROFILES_ACTIVE
-              valueFrom:
-                configMapKeyRef:
-                  name: config-server-config
-                  key: spring.profiles.active
-            - name: SPRING_CLOUD_CONFIG_SERVER_GIT_URI
-              valueFrom:
-                configMapKeyRef:
-                  name: config-server-config
-                  key: config.git.uri
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8889
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/configurations
+      volumes:
+        - name: config-volume
+          configMap:
+            name: service-configurations
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
