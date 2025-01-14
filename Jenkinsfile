@@ -39,9 +39,12 @@ pipeline {
                         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                     ]]) {
                         try {
-                            // Login to ECR
+                            // Modified Docker login for Windows
                             bat """
-                                aws ecr-public get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+                                @echo off
+                                for /f "tokens=*" %%i in ('aws ecr-public get-login-password --region ${AWS_REGION}') do set PASSWORD=%%i
+                                docker login --username AWS --password %PASSWORD% ${ECR_REGISTRY}
+                                set PASSWORD=
                             """
 
                             // Build and tag image
