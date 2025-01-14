@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        bat 'mvn clean package -DskipTests'
+                        sh 'mvn clean package -DskipTests'
                     } catch (Exception e) {
                         error "Maven build failed: ${e.message}"
                     }
@@ -39,21 +39,18 @@ pipeline {
                         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                     ]]) {
                         try {
-                            // Login to ECR - Modified for Windows
-                            bat """
-                                @echo off
-                                for /f "tokens=*" %%i in ('aws ecr-public get-login-password --region ${AWS_REGION}') do set PASSWORD=%%i
-                                docker login --username AWS --password %PASSWORD% ${ECR_REGISTRY}
-                                set PASSWORD=
+                            // Login to ECR
+                            sh """
+                                aws ecr-public get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
                             """
 
                             // Build and tag image
-                            bat """
+                            sh """
                                 docker build -t ${ECR_REGISTRY}/${IMAGE_NAME}:latest . --no-cache
                             """
 
                             // Push the latest tag
-                            bat """
+                            sh """
                                 docker push ${ECR_REGISTRY}/${IMAGE_NAME}:latest
                             """
                         } catch (Exception e) {
@@ -75,34 +72,30 @@ pipeline {
                     ]]) {
                         try {
                             // Configure kubectl
-                            bat """
+                            sh """
                                 aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
                             """
 
                             // Create namespace if doesn't exist
-                            bat """
-                                kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml > temp.yaml
-                                kubectl apply -f temp.yaml
-                                del temp.yaml
+                            sh """
+                                kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
                             """
 
                             // Create ConfigMap for service configurations
-                            bat """
-                                kubectl create configmap service-configurations --from-file=src/main/resources/configurations/ -n ${NAMESPACE} --dry-run=client -o yaml > config.yaml
-                                kubectl apply -f config.yaml
-                                del config.yaml
+                            sh """
+                                kubectl create configmap service-configurations --from-file=src/main/resources/configurations/ -n ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
                             """
 
                             // Apply K8s manifests
-                            bat """
+                            sh """
                                 kubectl apply -f k8s/configmap.yaml -n ${NAMESPACE}
                                 kubectl apply -f k8s/deployment.yaml -n ${NAMESPACE}
                                 kubectl apply -f k8s/service.yaml -n ${NAMESPACE}
                             """
 
                             // Check pod status
-                            bat """
-                                echo Checking pod status:
+                            sh """
+                                echo "Checking pod status:"
                                 kubectl get pods -n ${NAMESPACE} -l app=config-service
                             """
 
@@ -123,8 +116,8 @@ pipeline {
             echo 'Pipeline failed! Check the logs for details.'
         }
         always {
-            bat """
-                docker rmi ${ECR_REGISTRY}/${IMAGE_NAME}:latest || exit 0
+            sh """
+                docker rmi ${ECR_REGISTRY}/${IMAGE_NAME}:latest || true
             """
             cleanWs()
         }
