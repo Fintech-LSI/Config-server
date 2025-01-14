@@ -76,7 +76,7 @@ pipeline {
                                 aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
                             """
 
-                            // Create namespace if doesn't exist
+                            // Create namespace if not existant
                             sh """
                                 kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
                             """
