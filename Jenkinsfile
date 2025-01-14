@@ -23,7 +23,9 @@ pipeline {
                     try {
                         bat 'mvn clean package -DskipTests'
                     } catch (Exception e) {
-                        error "Maven build failed: ${e.message}"
+                        echo "Maven build failed: ${e.message}"
+                        echo "Stack trace: ${e.stackTrace}"
+                        error "Maven build stage failed"
                     }
                 }
             }
@@ -39,25 +41,29 @@ pipeline {
                         secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                     ]]) {
                         try {
-                            // Modified Docker login for Windows
+                            // Configure Docker credential store
+                            bat 'REG ADD HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce /v DockerCredentialWincred /t REG_SZ /d "docker-credential-wincred.exe store"'
+                            
+                            // Docker login
                             bat """
                                 @echo off
-                                for /f "tokens=*" %%i in ('aws ecr-public get-login-password --region ${AWS_REGION}') do set PASSWORD=%%i
-                                docker login --username AWS --password %PASSWORD% ${ECR_REGISTRY}
-                                set PASSWORD=
+                                aws ecr-public get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
                             """
 
                             // Build and tag image
                             bat """
-                                docker build -t ${ECR_REGISTRY}/${IMAGE_NAME}:latest . --no-cache
+                                docker build -t ${ECR_REGISTRY}/${IMAGE_NAME}:latest -t ${ECR_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER} . --no-cache || (echo "Docker build failed" && exit /b 1)
                             """
 
-                            // Push the latest tag
+                            // Push the tags
                             bat """
-                                docker push ${ECR_REGISTRY}/${IMAGE_NAME}:latest
+                                docker push ${ECR_REGISTRY}/${IMAGE_NAME}:latest || (echo "Docker push latest failed" && exit /b 1)
+                                docker push ${ECR_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER} || (echo "Docker push ${BUILD_NUMBER} failed" && exit /b 1)
                             """
                         } catch (Exception e) {
-                            error "Docker build/push failed: ${e.message}"
+                            echo "Docker build/push failed: ${e.message}"
+                            echo "Stack trace: ${e.stackTrace}"
+                            error "Docker build/push stage failed"
                         }
                     }
                 }
@@ -76,34 +82,36 @@ pipeline {
                         try {
                             // Configure kubectl
                             bat """
-                                aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
+                                aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME} || (echo "Failed to update kubeconfig" && exit /b 1)
                             """
 
                             // Create namespace if doesn't exist
                             bat """
-                                kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+                                kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f - || (echo "Failed to create/update namespace" && exit /b 1)
                             """
 
                             // Create ConfigMap for service configurations
                             bat """
-                                kubectl create configmap service-configurations --from-file=src/main/resources/configurations/ -n ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+                                kubectl create configmap service-configurations --from-file=src/main/resources/configurations/ -n ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f - || (echo "Failed to create/update ConfigMap" && exit /b 1)
                             """
 
                             // Apply K8s manifests
                             bat """
-                                kubectl apply -f k8s/configmap.yaml -n ${NAMESPACE}
-                                kubectl apply -f k8s/deployment.yaml -n ${NAMESPACE}
-                                kubectl apply -f k8s/service.yaml -n ${NAMESPACE}
+                                kubectl apply -f k8s/configmap.yaml -n ${NAMESPACE} || (echo "Failed to apply configmap" && exit /b 1)
+                                kubectl apply -f k8s/deployment.yaml -n ${NAMESPACE} || (echo "Failed to apply deployment" && exit /b 1)
+                                kubectl apply -f k8s/service.yaml -n ${NAMESPACE} || (echo "Failed to apply service" && exit /b 1)
                             """
 
                             // Check pod status
                             bat """
                                 echo "Checking pod status:"
-                                kubectl get pods -n ${NAMESPACE} -l app=config-service
+                                kubectl get pods -n ${NAMESPACE} -l app=config-service || (echo "Failed to get pod status" && exit /b 1)
                             """
 
                         } catch (Exception e) {
-                            error "Deployment failed: ${e.message}"
+                            echo "Deployment failed: ${e.message}"
+                            echo "Stack trace: ${e.stackTrace}"
+                            error "Deployment stage failed"
                         }
                     }
                 }
@@ -120,7 +128,7 @@ pipeline {
         }
         always {
             bat """
-                docker rmi ${ECR_REGISTRY}/${IMAGE_NAME}:latest || exit 0
+                docker rmi ${ECR_REGISTRY}/${IMAGE_NAME}:latest ${ECR_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER} || exit /b 0
             """
             cleanWs()
         }
