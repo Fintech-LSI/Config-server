@@ -9,6 +9,12 @@ spring:
     password: password                             # Database password
   jpa:
     hibernate:
-      ddl-auto: create                             # Use 'update' for schema updates without dropping
+      ddl-auto: update                             # Use 'update' for schema updates without dropping
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/  # Eureka server URL
+  instance:
+    preferIpAddress: true  # Register IP address instead of hostname
