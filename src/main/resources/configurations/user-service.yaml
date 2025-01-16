@@ -15,6 +15,6 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://discovery-service.fintech.svc.cluster.local:8761/eureka/  # Eureka server URL
+      defaultZone: http://10.0.1.37:8761/eureka/  # Eureka server URL
   instance:
     preferIpAddress: true  # Register IP address instead of hostname
