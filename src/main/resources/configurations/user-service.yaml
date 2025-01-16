@@ -4,7 +4,7 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/user_service_db  # Ensure this is your actual database name
+    url: jdbc:postgresql://postgres-instance.c122egeymo28.us-east-1.rds.amazonaws.com:5432/user_service_db  # Ensure this is your actual database name
     username: postgres                             # Database username
     password: password                             # Database password
   jpa:
