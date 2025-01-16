@@ -1,0 +1,14 @@
+server:
+  port: 8097
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/loans_service_db  # Ensure this is your actual database name
+    username: postgres                             # Database username
+    password: password                             # Database password
+  jpa:
+    hibernate:
+      ddl-auto: update                             # Use 'update' for schema updates without dropping
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
