@@ -6,7 +6,7 @@ metadata:
   labels:
     app: config-service
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - port: 8889
       targetPort: 8889
