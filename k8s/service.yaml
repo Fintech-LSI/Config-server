@@ -12,6 +12,5 @@ spec:
       targetPort: 8889
       protocol: TCP
       name: http
-  type: ClusterIP
   selector:
     app: config-service
