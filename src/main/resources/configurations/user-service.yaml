@@ -12,9 +12,9 @@ spring:
       ddl-auto: update                             # Use 'update' for schema updates without dropping
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://10.0.1.176:8761/eureka/  # Eureka server URL
-  instance:
-    preferIpAddress: true  # Register IP address instead of hostname
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://10.0.1.176:8761/eureka/  # Eureka server URL
+#  instance:
+#    preferIpAddress: true  # Register IP address instead of hostname

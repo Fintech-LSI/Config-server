@@ -4,7 +4,7 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/wallet_service_db  # Ensure this is your actual database name
+    url: jdbc:postgresql://postgres-instance.c122egeymo28.us-east-1.rds.amazonaws.com:5432/wallet_service_db  # Ensure this is your actual database name
     username: postgres                             # Database username
     password: password                             # Database password
   jpa:
@@ -12,9 +12,9 @@ spring:
       ddl-auto: update                             # Use 'update' for schema updates without dropping
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/  # Eureka server URL
-  instance:
-    preferIpAddress: true  # Register IP address instead of hostname
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka/  # Eureka server URL
+#  instance:
+#    preferIpAddress: true  # Register IP address instead of hostname

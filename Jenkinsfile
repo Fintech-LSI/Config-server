@@ -8,7 +8,7 @@ pipeline {
         DOCKER_BUILD_NUMBER = "${BUILD_NUMBER}"
         EKS_CLUSTER_NAME = 'main-cluster'
         NAMESPACE = 'fintech'
-        SONAR_HOST_URL = 'http://98.81.233.237:9000'
+        SONAR_HOST_URL = 'http://54.86.47.1:9000'
         SONAR_PROJECT_KEY = 'config-service'
     }
 
@@ -19,19 +19,7 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                script {
-                    try {
-                        sh 'mvn clean package -DskipTests'
-                    } catch (Exception e) {
-                        error "Maven build failed: ${e.message}"
-                    }
-                }
-            }
-        }
-
-       /* stage('SonarQube Analysis') {
+        stage('SonarQube Analysis') {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
@@ -65,7 +53,19 @@ pipeline {
                     }
                 }
             }
-        }*/
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    try {
+                        sh 'mvn clean package -DskipTests'
+                    } catch (Exception e) {
+                        error "Maven build failed: ${e.message}"
+                    }
+                }
+            }
+        }
 
         stage('Build & Push Docker Image') {
             steps {

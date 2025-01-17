@@ -37,9 +37,9 @@ spring:
           uri: lb://TRANSACTION-SERVICE
           predicates:
             - Path=/api/transaction/** # Corrected spacing and added missing "/*" for full path match
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/  # Eureka server URL
-  instance:
-    preferIpAddress: true  # Register IP address instead of hostname
+#eureka:
+  #client:
+    #serviceUrl:
+      #defaultZone: http://localhost:8761/eureka/  # Eureka server URL
+  #instance:
+    #preferIpAddress: true  # Register IP address instead of hostname
