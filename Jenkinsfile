@@ -23,17 +23,18 @@ pipeline {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
-                        try {
-                            // Run SonarQube analysis
-                            sh """
-                                mvn sonar:sonar \
-                                    -Dsonar.host.url=${SONAR_HOST_URL} \
-                                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                                    -Dsonar.login=${SONAR_TOKEN}
-                            """
-                            echo "SonarQube analysis completed successfully."
-                        } catch (Exception e) {
-                            error "SonarQube analysis failed: ${e.message}"
+                        withSonarQubeEnv('SonarQube') {  // Add this wrapper
+                            try {
+                                sh """
+                                    mvn clean verify sonar:sonar \
+                                        -Dsonar.host.url=${SONAR_HOST_URL} \
+                                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                                        -Dsonar.login=${SONAR_TOKEN}
+                                """
+                                echo "SonarQube analysis completed successfully."
+                            } catch (Exception e) {
+                                error "SonarQube analysis failed: ${e.message}"
+                            }
                         }
                     }
                 }
@@ -43,24 +44,8 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 script {
-                    try {
-                        // Handle first-time analysis
-                        def qualityGate = null
-                        timeout(time: 1, unit: 'HOURS') {
-                            qualityGate = waitForQualityGate()
-                        }
-
-                        if (qualityGate.status != 'OK') {
-                            error "Quality Gate failed: ${qualityGate.status}"
-                        } else {
-                            echo "Quality Gate passed: ${qualityGate.status}"
-                        }
-                    } catch (Exception e) {
-                        if (env.BUILD_NUMBER.toInteger() == 1) {
-                            echo "Skipping Quality Gate on first run: No previous analysis data available."
-                        } else {
-                            error "Quality Gate evaluation failed: ${e.message}"
-                        }
+                    timeout(time: 1, unit: 'HOURS') {
+                        waitForQualityGate abortPipeline: true
                     }
                 }
             }
