@@ -38,22 +38,13 @@ pipeline {
             }
         }
 
-        stage('Quality Gate') {
-            steps {
-                script {
-                    try {
-                        timeout(time: 1, unit: 'HOURS') {
-                            def qg = waitForQualityGate()
-                            if (qg.status != 'OK') {
-                                error "Quality gate failed: ${qg.status}"
-                            }
-                        }
-                    } catch (Exception e) {
-                        error "Quality gate check failed: ${e.message}"
-                    }
-                }
-            }
-        }
+       stage('Quality Gate') {
+           steps {
+               timeout(time: 1, unit: 'HOURS') {
+                   waitForQualityGate abortPipeline: true
+               }
+           }
+       }
 
         stage('Build') {
             steps {
