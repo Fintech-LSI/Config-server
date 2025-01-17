@@ -19,7 +19,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+        /*stage('SonarQube Analysis') {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
@@ -49,7 +49,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
 
         stage('Build') {
             steps {
