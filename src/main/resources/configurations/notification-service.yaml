@@ -5,7 +5,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://my-database-instance.c122egeymo28.us-east-1.rds.amazonaws.com:3306/notification_db
-    username: mysql
+    username: root
     password: password
   jpa:
     hibernate:
