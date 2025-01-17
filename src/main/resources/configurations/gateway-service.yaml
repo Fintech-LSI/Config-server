@@ -2,44 +2,97 @@ server:
   port: 8222
 
 spring:
+  application:
+    name: gateway-service
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
       routes:
         - id: user-service
-          uri: lb://USER-SERVICE # Load-balanced URI
+          uri: http://user-service:8090  # Directly use Kubernetes service name and port
           predicates:
-            - Path=/api/users/** # Ensure spacing and correct predicate format
+            - Path=/api/users/**
 
         - id: image-service
-          uri: lb://USER-SERVICE # Assuming image endpoint is served by user-service
+          uri: http://user-service:8090  # Assuming images are served by user-service
           predicates:
             - Path=/users/public/images/**
 
         - id: wallet-service
-          uri: lb://WALLET-SERVICE
+          uri: http://wallet-service:8099  # Directly use Kubernetes service name and port
           predicates:
             - Path=/api/wallets/**
 
         - id: wallet-service-currency
-          uri: lb://WALLET-SERVICE
+          uri: http://wallet-service:8099  # Same service, different path
           predicates:
             - Path=/api/currencies/**
 
         - id: auth-service
-          uri: lb://AUTH-SERVICE
+          uri: http://auth-service:8946  # Directly use Kubernetes service name and port
           predicates:
             - Path=/api/auth/**
 
         - id: transaction-service
-          uri: lb://TRANSACTION-SERVICE
+          uri: http://transaction-service:8599  # Directly use Kubernetes service name and port
           predicates:
-            - Path=/api/transaction/** # Corrected spacing and added missing "/*" for full path match
-#eureka:
-  #client:
-    #serviceUrl:
-      #defaultZone: http://localhost:8761/eureka/  # Eureka server URL
-  #instance:
-    #preferIpAddress: true  # Register IP address instead of hostname
+            - Path=/api/transaction/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"  # Expose all actuator endpoints
+  endpoint:
+    health:
+      show-details: always  # Show detailed health information
+
+
+
+#server:
+#  port: 8222
+#
+#spring:
+#  cloud:
+#    gateway:
+#      discovery:
+#        locator:
+#          enabled: false  # Disable service discovery
+#      routes:
+#        - id: user-service
+#          uri: http://user-service:8090  # Use K8s service name directly
+#          predicates:
+#            - Path=/api/users/**
+#
+#        - id: image-service
+#          uri: http://user-service:8090
+#          predicates:
+#            - Path=/users/public/images/**
+#
+#        - id: wallet-service
+#          uri: http://wallet-service:8099
+#          predicates:
+#            - Path=/api/wallets/**
+#
+#        - id: wallet-service-currency
+#          uri: http://wallet-service:8099
+#          predicates:
+#            - Path=/api/currencies/**
+#
+#        - id: auth-service
+#          uri: http://auth-service:8946
+#          predicates:
+#            - Path=/api/auth/**
+#
+#        - id: transaction-service
+#          uri: http://transaction-service:8599
+#          predicates:
+#            - Path=/api/transaction/**
+#
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
+#  endpoint:
+#    health:
+#      show-details: always
