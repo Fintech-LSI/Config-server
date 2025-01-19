@@ -41,6 +41,11 @@ spring:
           uri: http://notification-service:8085  # Directly use Kubernetes service name and port
           predicates:
             - Path=/api/notifications/**
+        - id: loans-service
+          uri: http://loans-service:8097  # Directly use Kubernetes service name and port
+          predicates:
+            - Path=/api/loans/**
+
 
 management:
   endpoints:
