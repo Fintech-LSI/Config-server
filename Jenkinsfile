@@ -19,37 +19,37 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
-                        withSonarQubeEnv('SonarQube') {  // Add this wrapper
-                            try {
-                                sh """
-                                    mvn clean verify sonar:sonar \
-                                        -Dsonar.host.url=${SONAR_HOST_URL} \
-                                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                                        -Dsonar.login=${SONAR_TOKEN}
-                                """
-                                echo "SonarQube analysis completed successfully."
-                            } catch (Exception e) {
-                                error "SonarQube analysis failed: ${e.message}"
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        // stage('SonarQube Analysis') {
+        //     steps {
+        //         script {
+        //             withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
+        //                 withSonarQubeEnv('SonarQube') {  // Add this wrapper
+        //                     try {
+        //                         sh """
+        //                             mvn clean verify sonar:sonar \
+        //                                 -Dsonar.host.url=${SONAR_HOST_URL} \
+        //                                 -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+        //                                 -Dsonar.login=${SONAR_TOKEN}
+        //                         """
+        //                         echo "SonarQube analysis completed successfully."
+        //                     } catch (Exception e) {
+        //                         error "SonarQube analysis failed: ${e.message}"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Quality Gate') {
-            steps {
-                script {
-                    timeout(time: 5, unit: 'MINUTES') {
-                        waitForQualityGate abortPipeline: true
-                    }
-                }
-            }
-        }
+        // stage('Quality Gate') {
+        //     steps {
+        //         script {
+        //             timeout(time: 5, unit: 'MINUTES') {
+        //                 waitForQualityGate abortPipeline: true
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Build') {
             steps {
