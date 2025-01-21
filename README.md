@@ -12,7 +12,7 @@ The **Config Server** is a critical infrastructure component that:
 
 ## Architecture
 
-![Config Server Architecture](https://velog.io/@18k7102dy/Spring-Cloud-cloud-config%EC%97%90-%EB%8C%80%ED%95%9C-%EC%84%A4%EB%AA%85-%EB%B0%8F-%EA%B5%AC%ED%98%84)
+![Config Server Architecture](https://velog.velcdn.com/images/18k7102dy/post/05d13c7a-9f34-437d-be41-ded0ebac1d61/image.webp)
 
 The diagram above illustrates how the Config Server centralizes configuration management for all microservices in our ecosystem.
 
